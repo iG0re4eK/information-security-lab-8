@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ИБ | лаб | 8</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main>
+      <div class="wrapper">
+        <div class="main-content">
+          <div class="canvas-content">
+            <div class="sliders-container">
+              <div class="slider-container">
+                <label for="aSlider">Параметр a:</label>
+                <input
+                  type="range"
+                  id="aSlider"
+                  min="-100"
+                  max="100"
+                  value="50"
+                />
+                <input
+                  type="number"
+                  id="aValue"
+                  class="slider-value"
+                  min="-100"
+                  max="100"
+                />
+              </div>
+              <div class="slider-container">
+                <label for="bSlider">Параметр b:</label>
+                <input
+                  type="range"
+                  id="bSlider"
+                  min="-100"
+                  max="100"
+                  value="50"
+                />
+                <input
+                  type="number"
+                  id="bValue"
+                  class="slider-value"
+                  min="-100"
+                  max="100"
+                />
+              </div>
+            </div>
+
+            <div class="formula-container">
+              y<sup>2</sup>=x<sup>3</sup>+a*x+b
+            </div>
+
+            <canvas id="myCanvas" width="800" height="600"></canvas>
+          </div>
+
+          <div class="pages-content">
+            <div class="page"></div>
+            <div class="step-btns">
+              <button>Назад</button><button>Дальше</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <script src="./main.js"></script>
+  </body>
+</html>
