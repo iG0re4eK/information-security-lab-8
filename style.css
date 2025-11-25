@@ -77,6 +77,7 @@ canvas {
 }
 
 .pages-content {
+  position: relative;
   width: 100%;
   padding: 1rem;
   display: flex;
@@ -118,5 +119,13 @@ canvas {
       color: rgb(58, 78, 145);
       transform: scale(0.97);
     }
+  }
+
+  .page-num {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
   }
 }

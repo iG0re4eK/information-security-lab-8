@@ -19,7 +19,7 @@
                   id="aSlider"
                   min="-100"
                   max="100"
-                  value="50"
+                  value="1"
                 />
                 <input
                   type="number"
@@ -27,6 +27,7 @@
                   class="slider-value"
                   min="-100"
                   max="100"
+                  value="1"
                 />
               </div>
               <div class="slider-container">
@@ -36,7 +37,7 @@
                   id="bSlider"
                   min="-100"
                   max="100"
-                  value="50"
+                  value="0"
                 />
                 <input
                   type="number"
@@ -44,15 +45,16 @@
                   class="slider-value"
                   min="-100"
                   max="100"
+                  value="0"
                 />
               </div>
             </div>
 
+            <canvas id="myCanvas" width="800" height="600"></canvas>
+
             <div class="formula-container">
               y<sup>2</sup>=x<sup>3</sup>+a*x+b
             </div>
-
-            <canvas id="myCanvas" width="800" height="600"></canvas>
           </div>
 
           <div class="pages-content">
@@ -60,10 +62,12 @@
             <div class="step-btns">
               <button>Назад</button><button>Дальше</button>
             </div>
+            <div class="page-num">Страница 1 из n</div>
           </div>
         </div>
       </div>
     </main>
-    <script src="./main.js"></script>
+    <script src="./js/main.js"></script>
+    <script src="./js/script.js" type="module"></script>
   </body>
 </html>
