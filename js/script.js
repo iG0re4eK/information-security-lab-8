@@ -1,6 +1,11 @@
 import { RobinMiller } from "./robinMiller.js";
 
-let p = 5103;
+const minStep = 0;
+const maxStep = 4;
+let currentStep = minStep;
+let validStep = false;
+
+let p = null;
 let x = 0;
 let y = null;
 let pointsP = [];
@@ -9,6 +14,128 @@ const a = 1;
 const b = 0;
 
 const RobinMillerAlg = new RobinMiller();
+
+const pValue = document.getElementById("pValue");
+const containerSetP = document.getElementById("containerSetP");
+const stepButtons = document.querySelector(".step-btns");
+const pageContent = document.querySelector(".pages-content");
+
+function validNumberField(fieldValue) {
+  if (fieldValue.trim() === "") {
+    return { isValid: false, message: "Поле не может быть пустым" };
+  }
+
+  if (!/^\d+$/.test(fieldValue)) {
+    return { isValid: false, message: "Введите целое число" };
+  }
+
+  const number = Number.parseInt(fieldValue);
+
+  if (number < 2) {
+    return { isValid: false, message: "Число должно быть больше 1" };
+  }
+
+  return { isValid: true, number: number };
+}
+
+pValue.addEventListener("change", () => {
+  containerSetP.innerHTML = "";
+  pValue.classList.remove("valid");
+  pValue.classList.remove("invalid");
+
+  const validation = validNumberField(pValue.value.trim());
+  validStep = validation.isValid;
+
+  if (!validation.isValid) {
+    pValue.classList.add("invalid");
+    containerSetP.innerHTML = validation.message || "Неверный формат числа";
+    return;
+  }
+
+  let pTemp = Number.parseInt(pValue.value.trim());
+  let prevP = [];
+  let nextP = [];
+
+  const isValid = RobinMillerAlg.robinMiller(pTemp);
+  validStep = isValid;
+
+  if (!isValid) {
+    pValue.classList.remove("valid");
+    pValue.classList.add("invalid");
+
+    let tempP = pTemp - 1;
+    while (prevP.length < 5 && tempP > 1) {
+      if (RobinMillerAlg.robinMiller(tempP)) {
+        prevP.push(tempP);
+      }
+      tempP--;
+    }
+
+    tempP = pTemp + 1;
+    while (nextP.length < 5) {
+      if (RobinMillerAlg.robinMiller(tempP)) {
+        nextP.push(tempP);
+      }
+      tempP++;
+    }
+
+    prevP.reverse();
+
+    const divPrevP = document.createElement("div");
+    prevP.forEach((el) => {
+      divPrevP.innerHTML += ` ${el}`;
+    });
+    containerSetP.appendChild(divPrevP);
+
+    const divNextP = document.createElement("div");
+    nextP.forEach((el) => {
+      divNextP.innerHTML += ` ${el}`;
+    });
+    containerSetP.appendChild(divNextP);
+  } else {
+    pValue.classList.add("valid");
+    pValue.classList.remove("invalid");
+    p = pTemp;
+  }
+});
+
+function updateUI() {
+  const prevButton = stepButtons.querySelector(".prev");
+  const nextButton = stepButtons.querySelector(".next");
+
+  prevButton.style.display = currentStep === minStep ? "none" : "block";
+  nextButton.style.display = currentStep === maxStep ? "none" : "block";
+
+  prevButton.disabled = currentStep === minStep;
+  nextButton.disabled = currentStep === maxStep;
+
+  const pages = pageContent.querySelectorAll(".page");
+
+  pages.forEach((el, index) => {
+    if (index !== currentStep) el.style.display = "none";
+    else {
+      el.style.display = "block";
+    }
+  });
+}
+
+stepButtons.addEventListener("click", (e) => {
+  if (e.target.classList.contains("prev") && currentStep > minStep) {
+    currentStep--;
+    updateUI();
+  } else if (
+    e.target.classList.contains("next") &&
+    currentStep < maxStep &&
+    validStep
+  ) {
+    currentStep++;
+    updateUI();
+  }
+});
+
+window.addEventListener("load", () => {
+  updateUI();
+});
 
 function sumMod(a, x, n) {
   let p = 1;
@@ -28,12 +155,12 @@ function sumMod(a, x, n) {
   return p < 0 ? p + n : p;
 }
 
-function ellepticheskaiaKrivaia(x) {
+function ellepticheskaiaKrivaia(x, a, b) {
   return Math.pow(x, 3) + x * a + b;
 }
 
-function checkX(x, p) {
-  const func = ellepticheskaiaKrivaia(x);
+function checkX(x, a, b, p) {
+  const func = ellepticheskaiaKrivaia(x, a, b);
   const temp = RobinMillerAlg.sumMod(func, 1, p);
   const tempSum = p + temp;
   if (Number.isInteger(Math.sqrt(tempSum))) {
@@ -159,7 +286,7 @@ function multiplyPoint(k, P, p) {
         )} + ${pointToString(pointToAdd)} = ${pointToString(result)}`
       );
 
-      console.log(`--------------------------------------------------`);
+      console.log(`=`.repeat(60));
     }
   }
 
@@ -172,42 +299,33 @@ function pointToString(point) {
 }
 
 function checkHasseTheorem(p, curvePoints) {
-  let N = curvePoints.length;
+  let G = curvePoints.length;
 
-  const sqrtP = Math.floor(Math.sqrt(p));
-  const hasseLower = p + 1 - 2 * sqrtP;
-  const hasseUpper = p + 1 + 2 * sqrtP;
-
-  const exactSqrtP = Math.sqrt(p);
-  const exactLower = p + 1 - 2 * exactSqrtP;
-  const exactUpper = p + 1 + 2 * exactSqrtP;
+  const sqrtP = Math.round(Math.sqrt(p));
+  const pLower = p + 1 - sqrtP;
+  const pUpper = p + 1 + sqrtP;
 
   console.log("\n" + "=".repeat(60));
   console.log("ДЕТАЛЬНАЯ ПРОВЕРКА ТЕОРЕМЫ ХАССЕ");
   console.log("=".repeat(60));
   console.log(`Порядок поля: p = ${p}`);
-  console.log(`Количество точек на кривой: N = ${N}`);
+  console.log(`Количество точек на кривой: G = ${G}`);
   console.log(`Ожидаемое количество точек: p + 1 = ${p + 1}`);
-  console.log(`√p = ${exactSqrtP.toFixed(6)}`);
-  console.log(`2√p = ${(2 * exactSqrtP).toFixed(6)}`);
-  console.log(`\nГраницы Хассе (целочисленные):`);
-  console.log(`Нижняя граница: ${p + 1} - 2⌊√${p}⌋ = ${hasseLower}`);
-  console.log(`Верхняя граница: ${p + 1} + 2⌊√${p}⌋ = ${hasseUpper}`);
-  console.log(`\nГраницы Хассе (точные):`);
-  console.log(`Нижняя граница: ${p + 1} - 2√${p} ≈ ${exactLower.toFixed(6)}`);
-  console.log(`Верхняя граница: ${p + 1} + 2√${p} ≈ ${exactUpper.toFixed(6)}`);
+  console.log(`√p = ${sqrtP.toFixed(6)}`);
 
-  const hasseSatisfied = hasseLower <= N && N <= hasseUpper;
+  console.log(`Граница: ${pLower} <= ${p + 1} <= ${pUpper}`);
 
-  console.log(`\nПроверка: ${hasseLower} ≤ ${N} ≤ ${hasseUpper}`);
+  const hasseSatisfied = pLower <= G && G <= pUpper;
+
+  console.log(`\nПроверка: ${pLower} ≤ ${G} ≤ ${pUpper}`);
   console.log(`Теорема Хассе выполняется: ${hasseSatisfied}`);
 
-  const deviation = Math.abs(N - (p + 1));
-  const maxAllowedDeviation = 2 * exactSqrtP;
+  const deviation = Math.abs(G - (p + 1));
+  const maxAllowedDeviation = 2 * sqrtP;
   const deviationRatio = deviation / maxAllowedDeviation;
 
   console.log(`\nДополнительная информация:`);
-  console.log(`Отклонение от p+1: |${N} - ${p + 1}| = ${deviation.toFixed(6)}`);
+  console.log(`Отклонение от p+1: |${G} - ${p + 1}| = ${deviation.toFixed(6)}`);
   console.log(
     `Максимально допустимое отклонение: 2√p ≈ ${maxAllowedDeviation.toFixed(6)}`
   );
@@ -225,96 +343,93 @@ function checkHasseTheorem(p, curvePoints) {
 
   return {
     p: p,
-    N: N,
-    hasseLower: hasseLower,
-    hasseUpper: hasseUpper,
-    exactLower: exactLower,
-    exactUpper: exactUpper,
+    G: G,
+    pLower: pLower,
+    pUpper: pUpper,
     satisfied: hasseSatisfied,
     deviation: deviation,
     maxDeviation: maxAllowedDeviation,
   };
 }
 
-function checkGroupOrderPrimality(orderInfo) {
-  try {
-    if (!orderInfo) {
-      console.error("Ошибка: orderInfo не определен");
-      return [];
-    }
-
-    const primeOrders = [];
-
-    const possibleOrders = [];
-
-    for (
-      let order = orderInfo.hasseLower;
-      order <= orderInfo.hasseUpper;
-      order++
-    ) {
-      possibleOrders.push(order);
-    }
-
-    console.log("\n" + "=".repeat(60));
-    console.log("ПРОВЕРКА ПРОСТОТЫ ВОЗМОЖНЫХ ПОРЯДКОВ ГРУППЫ");
-    console.log("=".repeat(60));
-    console.log(
-      `Возможные порядки: от ${orderInfo.hasseLower} до ${orderInfo.hasseUpper}`
-    );
-
-    for (const order of possibleOrders) {
-      if (RobinMillerAlg.robinMiller(order)) {
-        primeOrders.push(order);
-        console.log(`Порядок ${order} - ПРОСТОЙ`);
-      } else {
-        console.log(`Порядок ${order} - составной`);
+function findPointOrder(P, groupOrder, p) {
+  const divisors = [];
+  for (let i = 1; i <= Math.sqrt(groupOrder); i++) {
+    if (groupOrder % i === 0) {
+      divisors.push(i);
+      if (i !== groupOrder / i) {
+        divisors.push(groupOrder / i);
       }
     }
-
-    if (primeOrders.length > 0) {
-      console.log(`\nПростые порядки группы: [${primeOrders.join(", ")}]`);
-      return primeOrders;
-    } else {
-      console.log("\nСреди возможных порядков нет простых чисел");
-      return [];
-    }
-  } catch (error) {
-    console.error("Ошибка в checkGroupOrderPrimality:", error);
-    return [];
   }
-}
+  divisors.sort((a, b) => a - b);
 
-// 1
-while (!RobinMillerAlg.robinMiller(p)) {
-  p += 2;
+  for (const k of divisors) {
+    const result = multiplyPoint(k, P, p);
+    if (result[0] === "*" && result[1] === "*") {
+      return k;
+    }
+  }
+  return groupOrder;
 }
-
-console.log("p:", p);
 
 // 2
-while (!checkX(x, p)) {
+/* while (!checkX(x, a, b, p)) {
   x++;
-}
+} */
 
-console.log("x:", x);
+/* console.log("x:", x);
 pointsP = [x, y];
-console.log("point p:", pointsP);
+console.log("point p:", pointsP); */
 
 // 3
-const resultP = multiplyPoint(numberP, pointsP, p);
-console.log(`${numberP}P = (${resultP.join("; ")})`);
+/* const resultP = multiplyPoint(numberP, pointsP, p);
+console.log(`${numberP}P = (${resultP.join("; ")})`); */
 
 // 4
-const allPoints = findAllPoints(p);
+/* const allPoints = findAllPoints(p);
 const orderInfo = checkHasseTheorem(p, allPoints);
-console.log(orderInfo);
+console.log(orderInfo); */
 
 // 5
-const primeOrders = checkGroupOrderPrimality(orderInfo);
+/* if (pointsP[0] !== "*") {
+  console.log("\n" + "=".repeat(50));
+  console.log("ШАГ 5: ПОРЯДОК ТОЧКИ P");
+  console.log("=".repeat(50));
 
-if (primeOrders.length > 0) {
-  console.log("\n✓ УСПЕХ: Найдены простые порядки группы эллиптической кривой");
-  console.log(`Рекомендуемый порядок группы: ${primeOrders[0]}`);
-} else {
-  console.log("\n⚠ ВНИМАНИЕ: Не найдено простых порядков группы");
+  const ySquared =
+    (pointsP[0] * pointsP[0] * pointsP[0] + a * pointsP[0] + b) % p;
+  const actualYSquared = (pointsP[1] * pointsP[1]) % p;
+
+  if (ySquared === actualYSquared) {
+    console.log(`✓ Точка P(${pointsP[0]}, ${pointsP[1]}) принадлежит кривой`);
+
+    const groupOrder = allPoints.length;
+    const pointOrder = findPointOrder(pointsP, groupOrder, p);
+
+    console.log(`Порядок группы: ${groupOrder}`);
+    console.log(`Порядок точки P: ${pointOrder}`);
+
+    const lagrangeCheck = groupOrder % pointOrder === 0;
+    console.log(
+      `Проверка теоремы Лагранжа: ${groupOrder} % ${pointOrder} === 0`
+    );
+    console.log(`Результат: ${lagrangeCheck ? "✓ ВЕРНО" : "✗ ОШИБКА"}`);
+
+    if (lagrangeCheck) {
+      const cofactor = groupOrder / pointOrder;
+      console.log(`Кофактор: ${groupOrder} / ${pointOrder} = ${cofactor}`);
+
+      if (pointOrder === groupOrder) {
+        console.log(
+          "✓ Точка P является образующей (порядок равен порядку группы)"
+        );
+      } else {
+        console.log("Точка P не является образующей");
+      }
+    }
+  } else {
+    console.log("✗ ОШИБКА: Точка P не принадлежит кривой!");
+  }
 }
+ */
