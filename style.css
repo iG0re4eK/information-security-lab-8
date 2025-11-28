@@ -49,7 +49,7 @@ canvas {
 }
 
 .slider-container {
-  color: white;
+  color: rgb(0, 0, 0);
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -60,14 +60,15 @@ canvas {
   display: inline-block;
   width: 4rem;
   height: 2rem;
+
   padding-left: 0.6rem;
   font-weight: bold;
   border-radius: 0.4rem;
-  border: none;
+  border: 1px solid black;
 }
 
 .inputs-container {
-  color: white;
+  color: rgb(0, 0, 0);
   display: flex;
   justify-content: space-around;
 }
@@ -111,6 +112,7 @@ canvas {
     top: 4.5rem;
     left: 1rem;
     right: 1rem;
+    overflow-y: scroll;
     bottom: 5rem;
     border-radius: 0.4rem;
     padding: 1.5rem;
@@ -120,6 +122,34 @@ canvas {
       display: flex;
       flex-direction: column;
       gap: 2rem;
+    }
+
+    .container-points {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+
+      .points-header {
+        background-color: rgb(0, 145, 255);
+        color: white;
+        padding: 0.2rem;
+        text-align: center;
+        border-radius: 0.5rem;
+      }
+
+      .points-card {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        background-color: rgb(229, 242, 255);
+        border-left: 5px solid rgb(0, 145, 255);
+        border-radius: 0.4rem;
+        padding: 0.5rem;
+      }
+    }
+
+    .decompose-number-p {
+      display: flex;
     }
 
     .container-p {
@@ -139,6 +169,19 @@ canvas {
       border: 1px solid black;
       border-radius: 0.4rem;
     }
+
+    .container-x {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+
+      .container-x-row {
+        background-color: rgb(229, 242, 255);
+        padding: 0.5rem;
+        border-left: 5px solid rgb(0, 145, 255);
+        border-radius: 0.4rem;
+      }
+    }
   }
 
   .step-btns {
@@ -149,13 +192,6 @@ canvas {
 
     button {
       position: absolute;
-      cursor: pointer;
-      border: none;
-      border-radius: 0.4rem;
-      padding: 0.8rem 1.5rem;
-      transition: 0.2s ease;
-      background-color: rgb(26, 171, 255);
-      color: white;
     }
 
     button:hover {
@@ -186,4 +222,26 @@ canvas {
     transform: translateX(-50%);
     color: white;
   }
+}
+
+button {
+  background-color: rgb(26, 171, 255);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  cursor: pointer;
+  border-radius: 0.4rem;
+  transition: 0.2s ease;
+}
+
+button:hover {
+  box-shadow: 0 0 4px rgb(146, 206, 255);
+  background-color: rgb(21, 107, 183);
+}
+
+button:active {
+  box-shadow: 0 0 2px rgb(146, 206, 255);
+  background-color: rgb(166, 208, 255);
+  color: rgb(58, 78, 145);
+  transform: scale(0.97);
 }

@@ -11,45 +11,6 @@
       <div class="wrapper">
         <div class="main-content">
           <div class="canvas-content">
-            <div class="sliders-container">
-              <div class="slider-container">
-                <label for="aSlider">Параметр a:</label>
-                <input
-                  type="range"
-                  id="aSlider"
-                  min="-100"
-                  max="100"
-                  value="1"
-                />
-                <input
-                  type="number"
-                  id="aValue"
-                  class="slider-value"
-                  min="-100"
-                  max="100"
-                  value="1"
-                />
-              </div>
-              <div class="slider-container">
-                <label for="bSlider">Параметр b:</label>
-                <input
-                  type="range"
-                  id="bSlider"
-                  min="-100"
-                  max="100"
-                  value="0"
-                />
-                <input
-                  type="number"
-                  id="bValue"
-                  class="slider-value"
-                  min="-100"
-                  max="100"
-                  value="0"
-                />
-              </div>
-            </div>
-
             <canvas id="myCanvas" width="800" height="600"></canvas>
 
             <div class="formula-container">
@@ -83,81 +44,139 @@
                   y<sup>2</sup>=x<sup>3</sup>+a*x+b точку P с минимальным
                   положительным x (a = 1, b = 0).
                 </h2>
-                <p>У нас <b>p</b> должно быть простым числом.</p>
-                <div class="container-p">
-                  <label for="pValue"
-                    >p =
+                <div class="sliders-container">
+                  <div class="slider-container">
+                    <label for="aSlider">Параметр a:</label>
                     <input
-                      type="text"
-                      id="pValue"
-                      class="input-field"
-                      placeholder="Введите простое число p"
-                  /></label>
+                      type="range"
+                      id="aSlider"
+                      min="-100"
+                      max="100"
+                      value="1"
+                    />
+                    <input
+                      type="number"
+                      id="aValue"
+                      class="slider-value"
+                      min="-100"
+                      max="100"
+                      value="1"
+                    />
+                  </div>
+                  <div class="slider-container">
+                    <label for="bSlider">Параметр b:</label>
+                    <input
+                      type="range"
+                      id="bSlider"
+                      min="-100"
+                      max="100"
+                      value="0"
+                    />
+                    <input
+                      type="number"
+                      id="bValue"
+                      class="slider-value"
+                      min="-100"
+                      max="100"
+                      value="0"
+                    />
+                  </div>
                 </div>
-                <div id="containerSetP" class="container-set-p"></div>
+                <button id="findBtnX">Найти точку</button>
+                <div class="container-x"></div>
               </div>
             </div>
             <div class="page">
               <div class="page-content">
-                <h2>
-                  Шаг 3: Перебором найдем на линии
-                  y<sup>2</sup>=x<sup>3</sup>+a*x+b точку P с минимальным
-                  положительным x (a = 1, b = 0).
-                </h2>
-                <p>У нас <b>p</b> должно быть простым числом.</p>
-                <div class="container-p">
-                  <label for="pValue"
-                    >p =
-                    <input
-                      type="text"
-                      id="pValue"
-                      class="input-field"
-                      placeholder="Введите простое число p"
-                  /></label>
-                </div>
-                <div id="containerSetP" class="container-set-p"></div>
+                <h2>Шаг 3: Найти 151P для заданной точки.</h2>
+                <p>Декомпозируем число на двойки:</p>
+                <div class="decompose-number-p"></div>
+                <p>
+                  Напомним правило сложения двух точек P = (x<sub>1</sub>;
+                  y<sub>1</sub>), Q = (x<sub>12</sub>; y<sub>2</sub>) лежащих на
+                  эллептической кривой.
+                </p>
+                <p>P + E = P для любой P.</p>
+                <p>
+                  I) Если x<sub>2</sub> ≠ x<sub>1</sub>, то k = (y<sub>2</sub> -
+                  y<sub>1</sub>)(x<sub>2</sub> - x<sub>1</sub>)<sup>-1</sup>, x
+                  = k<sup>2</sup> - (x<sub>1</sub> + x<sub>2</sub>), y = k(x<sub
+                    >1</sub
+                  >
+                  - x) - y<sub>1</sub>.
+                </p>
+                <p>
+                  II) Если x<sub>2</sub> = x<sub>1</sub> и y<sub>1</sub> + y<sub
+                    >2</sub
+                  >
+                  = 0, то P + Q = E = (*; ∞) - бесконечно удаленная точка.
+                </p>
+                <p>
+                  III) Если x<sub>2</sub> = x<sub>1</sub> и y<sub>2</sub> =
+                  y<sub>1</sub>, то k = (3x<sub>1</sub><sup>2</sup> +
+                  a)(2y<sub>1</sub>)<sup>-1</sup>, x = k<sup>2</sup> -
+                  2x<sub>1</sub>, y = k(x<sub>1</sub> - x) - y<sub>1</sub>.
+                </p>
+                <p>Замечания:</p>
+                <p>1) Все вычисления выполняются по модулю p.</p>
+                <p>
+                  2) I - сложение точек с разными абциссами; II - сложение
+                  противоположных точек, всегда дает нейтральную точку E; III -
+                  сложение одинаковых точек, также называется удвоением.
+                </p>
+                <p>
+                  3) Сложение различных точек и удваение используют различные
+                  формулы для промежуточной величины k, но формулы для x и y
+                  идентичны.
+                </p>
+                <div class="container-points"></div>
               </div>
             </div>
             <div class="page">
               <div class="page-content">
-                <h2>
-                  Шаг 4: Перебором найдем на линии
-                  y<sup>2</sup>=x<sup>3</sup>+a*x+b точку P с минимальным
-                  положительным x (a = 1, b = 0).
-                </h2>
-                <p>У нас <b>p</b> должно быть простым числом.</p>
-                <div class="container-p">
-                  <label for="pValue"
-                    >p =
-                    <input
-                      type="text"
-                      id="pValue"
-                      class="input-field"
-                      placeholder="Введите простое число p"
-                  /></label>
-                </div>
-                <div id="containerSetP" class="container-set-p"></div>
+                <h2>Шаг 4: Найти порядок линии.</h2>
+                <p>Порядок кривой будем искать с помощью перебора.</p>
+                <p>
+                  Определение. Порядком эллептической кривой называется
+                  количество точек на ней.
+                </p>
+                <p>
+                  Теорема Хассе. Если эллептическая кривая задана над полем
+                  содержащим q элементов, то число |G| точек на ней
+                  удовлетворяет неравенству:
+                </p>
+                <p>q + 1 - √q <= |G| <= q + 1 + √q</p>
+                <p>
+                  Найдем перебором количество точек на кривой (перебираем все
+                  конечные точки и добавляем одну бесконечную).
+                </p>
               </div>
             </div>
             <div class="page">
               <div class="page-content">
-                <h2>
-                  Шаг 5: Перебором найдем на линии
-                  y<sup>2</sup>=x<sup>3</sup>+a*x+b точку P с минимальным
-                  положительным x (a = 1, b = 0).
-                </h2>
-                <p>У нас <b>p</b> должно быть простым числом.</p>
-                <div class="container-p">
-                  <label for="pValue"
-                    >p =
-                    <input
-                      type="text"
-                      id="pValue"
-                      class="input-field"
-                      placeholder="Введите простое число p"
-                  /></label>
-                </div>
-                <div id="containerSetP" class="container-set-p"></div>
+                <h2>Шаг 5: Найти порядок точки P.</h2>
+                <p>
+                  Определение: порядком точки эллептической кривой называется
+                  минимальное k такое, что kP = E.
+                </p>
+                <p>
+                  Если порядок элемента большой, то поиск порядка точки
+                  перебором всех кратных точек kP является долгим и
+                  неэффективным.
+                </p>
+                <p>
+                  Утверждение 1. Порядок элемента является делителем порядка
+                  группы. Если обозначить порядок группы N, то NP = E.
+                </p>
+                <p>
+                  Утверждение 2. Если kP = E, где k = p<sub>1</sub
+                  ><sup>a<sub>1</sub></sup> * p<sub>2</sub
+                  ><sup>a<sub>2</sub></sup> * ... * p<sub>m</sub
+                  ><sup>a<sub>m</sub></sup> - каноническое разложение k на
+                  простые множители. Обозначим k<sub>i</sub> = k/p<sub>i</sub>.
+                  Если при этом k<sub>i</sub>P ≠ E ∀i = 1, ..., m, то порядок
+                  точки P равен k.
+                </p>
               </div>
             </div>
             <div class="step-btns">

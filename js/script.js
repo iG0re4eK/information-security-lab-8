@@ -4,14 +4,15 @@ const minStep = 0;
 const maxStep = 4;
 let currentStep = minStep;
 let validStep = false;
+let validSteps = Array(maxStep + 1).fill(false);
 
 let p = null;
-let x = 0;
+
 let y = null;
 let pointsP = [];
 const numberP = 151;
-const a = 1;
-const b = 0;
+let a = 1;
+let b = 0;
 
 const RobinMillerAlg = new RobinMiller();
 
@@ -19,6 +20,12 @@ const pValue = document.getElementById("pValue");
 const containerSetP = document.getElementById("containerSetP");
 const stepButtons = document.querySelector(".step-btns");
 const pageContent = document.querySelector(".pages-content");
+const aValue = document.getElementById("aValue");
+const bValue = document.getElementById("bValue");
+const findBtnX = document.getElementById("findBtnX");
+const containerX = document.querySelector(".container-x");
+const decompoaseNumberP = document.querySelector(".decompose-number-p");
+const containerPoints = document.querySelector(".container-points");
 
 function validNumberField(fieldValue) {
   if (fieldValue.trim() === "") {
@@ -38,7 +45,29 @@ function validNumberField(fieldValue) {
   return { isValid: true, number: number };
 }
 
-pValue.addEventListener("change", () => {
+findBtnX.addEventListener("click", () => {
+  let x = 0;
+  containerX.innerHTML = ``;
+  a = Number.parseInt(aValue.value);
+  b = Number.parseInt(bValue.value);
+
+  validSteps[1] = false;
+
+  while (!checkX(x, a, b, p)) {
+    x++;
+  }
+  pointsP = [x, y];
+
+  validSteps[1] = true;
+  updateUI();
+
+  const divPoint = document.createElement("div");
+  divPoint.innerHTML = `P = (${pointsP[0]}; ${pointsP[1]})`;
+  containerX.appendChild(divPoint);
+});
+
+function init() {
+  containerX.innerHTML = ``;
   containerSetP.innerHTML = "";
   pValue.classList.remove("valid");
   pValue.classList.remove("invalid");
@@ -49,6 +78,8 @@ pValue.addEventListener("change", () => {
   if (!validation.isValid) {
     pValue.classList.add("invalid");
     containerSetP.innerHTML = validation.message || "Неверный формат числа";
+    validSteps[0] = false;
+    updateUI();
     return;
   }
 
@@ -60,6 +91,8 @@ pValue.addEventListener("change", () => {
   validStep = isValid;
 
   if (!isValid) {
+    validSteps[0] = false;
+
     pValue.classList.remove("valid");
     pValue.classList.add("invalid");
 
@@ -82,21 +115,22 @@ pValue.addEventListener("change", () => {
     prevP.reverse();
 
     const divPrevP = document.createElement("div");
-    prevP.forEach((el) => {
-      divPrevP.innerHTML += ` ${el}`;
-    });
+    divPrevP.innerHTML =
+      "Ближайшие простые числа: " + prevP.join(", ") + " | " + nextP.join(", ");
     containerSetP.appendChild(divPrevP);
-
-    const divNextP = document.createElement("div");
-    nextP.forEach((el) => {
-      divNextP.innerHTML += ` ${el}`;
-    });
-    containerSetP.appendChild(divNextP);
   } else {
+    validSteps[0] = true;
+
     pValue.classList.add("valid");
     pValue.classList.remove("invalid");
     p = pTemp;
   }
+
+  updateUI();
+}
+
+pValue.addEventListener("input", () => {
+  init();
 });
 
 function updateUI() {
@@ -107,7 +141,9 @@ function updateUI() {
   nextButton.style.display = currentStep === maxStep ? "none" : "block";
 
   prevButton.disabled = currentStep === minStep;
-  nextButton.disabled = currentStep === maxStep;
+
+  const canProceed = validSteps[currentStep] && currentStep < maxStep;
+  nextButton.disabled = !canProceed;
 
   const pages = pageContent.querySelectorAll(".page");
 
@@ -115,8 +151,117 @@ function updateUI() {
     if (index !== currentStep) el.style.display = "none";
     else {
       el.style.display = "block";
+
+      if (index === 2 && validSteps[1] && !validSteps[2]) {
+        calculateStep2();
+      } else if (index === 3 && validSteps[2] && !validSteps[3]) {
+        calculateStep3();
+      } else if (index === 4 && validSteps[3] && !validSteps[4]) {
+        calculateStep4();
+      }
     }
   });
+}
+
+function calculateStep2() {
+  console.log("Выполняем вычисления для шага 2...");
+
+  const resultP = multiplyPoint(numberP, pointsP, p, containerPoints);
+  console.log(`${numberP}P = (${resultP.join("; ")})`);
+
+  const step2Result = document.getElementById("step2Result");
+  if (step2Result) {
+    step2Result.innerHTML = `${numberP}P = (${resultP.join("; ")})`;
+  }
+
+  validSteps[2] = true;
+  updateUI();
+}
+
+function calculateStep3() {
+  console.log("Выполняем вычисления для шага 3...");
+
+  const allPoints = findAllPoints(p);
+  const orderInfo = checkHasseTheorem(p, allPoints);
+  console.log(orderInfo);
+
+  const step3Result = document.getElementById("step3Result");
+  if (step3Result) {
+    step3Result.innerHTML = `
+      Количество точек: ${orderInfo.G}<br>
+      Границы Хассе: ${orderInfo.pLower} ≤ ${orderInfo.G} ≤ ${
+      orderInfo.pUpper
+    }<br>
+      Теорема Хассе: ${orderInfo.satisfied ? "выполняется" : "не выполняется"}
+    `;
+  }
+
+  validSteps[3] = true;
+  updateUI();
+}
+
+function calculateStep4() {
+  console.log("Выполняем вычисления для шага 4...");
+
+  const allPoints = findAllPoints(p);
+
+  if (pointsP[0] !== "*") {
+    console.log("\n" + "=".repeat(50));
+    console.log("ШАГ 4: ПОРЯДОК ТОЧКИ P");
+    console.log("=".repeat(50));
+
+    const ySquared =
+      (pointsP[0] * pointsP[0] * pointsP[0] + a * pointsP[0] + b) % p;
+    const actualYSquared = (pointsP[1] * pointsP[1]) % p;
+
+    if (ySquared === actualYSquared) {
+      console.log(`✓ Точка P(${pointsP[0]}, ${pointsP[1]}) принадлежит кривой`);
+
+      const groupOrder = allPoints.length;
+      const pointOrder = findPointOrder(pointsP, groupOrder, p);
+
+      console.log(`Порядок группы: ${groupOrder}`);
+      console.log(`Порядок точки P: ${pointOrder}`);
+
+      const lagrangeCheck = groupOrder % pointOrder === 0;
+      console.log(
+        `Проверка теоремы Лагранжа: ${groupOrder} % ${pointOrder} === 0`
+      );
+      console.log(`Результат: ${lagrangeCheck ? "✓ ВЕРНО" : "✗ ОШИБКА"}`);
+
+      const step4Result = document.getElementById("step4Result");
+      if (step4Result) {
+        let resultHTML = `
+          Порядок группы: ${groupOrder}<br>
+          Порядок точки P: ${pointOrder}<br>
+          Теорема Лагранжа: ${lagrangeCheck ? "выполняется" : "не выполняется"}
+        `;
+
+        if (lagrangeCheck) {
+          const cofactor = groupOrder / pointOrder;
+          resultHTML += `<br>Кофактор: ${groupOrder} / ${pointOrder} = ${cofactor}`;
+
+          if (pointOrder === groupOrder) {
+            resultHTML += `<br>✓ Точка P является образующей (порядок равен порядку группы)`;
+          } else {
+            resultHTML += `<br>Точка P не является образующей`;
+          }
+        }
+
+        step4Result.innerHTML = resultHTML;
+      }
+    } else {
+      console.log("✗ ОШИБКА: Точка P не принадлежит кривой!");
+
+      const step4Result = document.getElementById("step4Result");
+      if (step4Result) {
+        step4Result.innerHTML = "ОШИБКА: Точка P не принадлежит кривой!";
+      }
+    }
+  }
+
+  validSteps[4] = true;
+  updateUI();
 }
 
 stepButtons.addEventListener("click", (e) => {
@@ -126,7 +271,7 @@ stepButtons.addEventListener("click", (e) => {
   } else if (
     e.target.classList.contains("next") &&
     currentStep < maxStep &&
-    validStep
+    validSteps[currentStep]
   ) {
     currentStep++;
     updateUI();
@@ -160,13 +305,38 @@ function ellepticheskaiaKrivaia(x, a, b) {
 }
 
 function checkX(x, a, b, p) {
+  const divRow = document.createElement("div");
+  divRow.className = "container-x-row";
+
+  const divX = document.createElement("div");
+  divX.innerHTML = `x = ${x} `;
+  divRow.appendChild(divX);
+
   const func = ellepticheskaiaKrivaia(x, a, b);
   const temp = RobinMillerAlg.sumMod(func, 1, p);
+
+  const divTemp = document.createElement("div");
+  divTemp.innerHTML = `y<sup>2</sup> = ${func} mod ${p}`;
+  divRow.appendChild(divTemp);
+
   const tempSum = p + temp;
-  if (Number.isInteger(Math.sqrt(tempSum))) {
-    y = Math.sqrt(tempSum);
+
+  const divSum = document.createElement("div");
+  divSum.innerHTML = `y<sup>2</sup> = ${p} + ${temp} = ${tempSum}`;
+  divRow.appendChild(divSum);
+
+  const divSqrt = document.createElement("div");
+  y = Math.sqrt(tempSum);
+
+  if (Number.isInteger(y)) {
+    divSqrt.innerHTML = `y = ${y}`;
+    divRow.appendChild(divSqrt);
+    containerX.appendChild(divRow);
     return true;
   }
+  divSqrt.innerHTML = `y = ${y}`;
+  divRow.appendChild(divSqrt);
+  containerX.appendChild(divRow);
   return false;
 }
 
@@ -202,14 +372,32 @@ function findAllPoints(p) {
   return points;
 }
 
-function sumPoints(P, Q, p) {
-  if (P[0] === "*" && P[1] === "*") return Q;
-  if (Q[0] === "*" && Q[1] === "*") return P;
+function sumPoints(P, Q, p, container) {
+  const divCard = document.createElement("div");
+  const divHeader = document.createElement("div");
+  divHeader.className = "points-header";
+  const divPoint = document.createElement("div");
+  divCard.className = "points-card";
+
+  if (P[0] === "*" && P[1] === "*") {
+    divPoint.innerHTML = `P: (${P[0]}; ${P[1]})`;
+    container.appendChild(divPoint);
+    return Q;
+  }
+  if (Q[0] === "*" && Q[1] === "*") {
+    divPoint.innerHTML = `Q: (${Q[0]}; ${Q[1]})`;
+    container.appendChild(divPoint);
+    return P;
+  }
+
+  const divPointK = document.createElement("div");
+  const divPointX = document.createElement("div");
+  const divPointY = document.createElement("div");
+  const divPointResult = document.createElement("div");
 
   if (P[0] === Q[0] && P[1] === Q[1]) {
-    console.log(
-      `Случай 3 (${P[0]}; ${P[1]}) и (${Q[0]}; ${Q[1]}): x_2 == x_1 и y_2 == y_1.`
-    );
+    divHeader.innerHTML = `Случай 3 (${P[0]}; ${P[1]}) и (${Q[0]}; ${Q[1]}): x_2 == x_1 и y_2 == y_1.`;
+
     const temp = sumMod(2 * P[1], p - 2, p);
     console.log(`temp: ${temp}`);
 
@@ -219,17 +407,42 @@ function sumPoints(P, Q, p) {
     const x = sumMod(Math.pow(k, 2) - 2 * P[0], 1, p);
     const y = sumMod(k * (P[0] - x) - P[1], 1, p);
 
+    divPointK.innerHTML = `k = (3 * ${P[0]}<sup>2</sup> + ${a})(2 * ${
+      Q[0]
+    })<sup>-1</sup> mod ${p} = ${
+      3 * Math.pow(P[0], 2) + a
+    } * ${temp} mod ${p} = ${k}`;
+
+    divPointX.innerHTML = `x = ${k}<sup>2</sup> - 2 * ${
+      P[0]
+    } mod ${p} = ${Math.pow(k, 2)} - ${2 * P[0]} mod ${p} = ${x}`;
+
+    divPointY.innerHTML = `y = ${k} * (${P[0]} - ${x}) - ${
+      Q[0]
+    } mod ${p} = ${k} * ${P[0] - x} - ${Q[0]} mod ${p} = ${y}`;
+
+    divPointResult.innerHTML = `(${x}; ${y})`;
+
+    divCard.appendChild(divHeader);
+    divCard.appendChild(divPointK);
+    divCard.appendChild(divPointX);
+    divCard.appendChild(divPointY);
+    divCard.appendChild(divPointResult);
+    container.appendChild(divCard);
+
     return [x, y];
   } else if (P[0] === Q[0] && P[1] + Q[1] === 0) {
-    console.log(
-      `Случай 2 (${P[0]}; ${P[1]}) и (${Q[0]}; ${Q[1]}): Бесконечно удаленная точка.`
-    );
+    divHeader.innerHTML = `Случай 2 (${P[0]}; ${P[1]}) и (${Q[0]}; ${Q[1]}): Бесконечно удаленная точка.`;
+    divPointResult.innerHTML = `(*; *)`;
+
+    divCard.appendChild(divHeader);
+    divCard.appendChild(divPointResult);
+    container.appendChild(divCard);
 
     return ["*", "*"];
   } else {
-    console.log(
-      `Случай 1 (${P[0]}; ${P[1]}) и (${Q[0]}; ${Q[1]}): x_2 != x_1.`
-    );
+    divHeader.innerHTML = `Случай 1 (${P[0]}; ${P[1]}) и (${Q[0]}; ${Q[1]}): x_2 != x_1.`;
+
     const temp = sumMod(Q[0] - P[0], p - 2, p);
     console.log(`temp: ${temp}`);
 
@@ -239,11 +452,30 @@ function sumPoints(P, Q, p) {
     const x = sumMod(Math.pow(k, 2) - P[0] - Q[0], 1, p);
     const y = sumMod(k * (P[0] - x) - P[1], 1, p);
 
+    divPointK.innerHTML = `k = (${Q[1]} - ${Q[0]})(${P[1]} - ${P[0]})<sup>-1</sup> mod ${p} = ${Q[1]} - ${Q[0]} * ${temp} mod ${p} = ${k}`;
+
+    divPointX.innerHTML = `x = ${k}<sup>2</sup> - (${P[0]} + ${
+      P[1]
+    }) mod ${p} = ${Math.pow(k, 2)} - ${P[0] + P[1]} mod ${p} = ${x}`;
+
+    divPointY.innerHTML = `y = ${k} * (${P[0]} - ${x}) - ${
+      Q[0]
+    } mod ${p} = ${k} * ${P[0] - x} - ${Q[0]} mod ${p} = ${y}`;
+
+    divPointResult.innerHTML = `(${x}; ${y})`;
+
+    divCard.appendChild(divHeader);
+    divCard.appendChild(divPointK);
+    divCard.appendChild(divPointX);
+    divCard.appendChild(divPointY);
+    divCard.appendChild(divPointResult);
+    container.appendChild(divCard);
+
     return [x, y];
   }
 }
 
-function multiplyPoint(k, P, p) {
+function multiplyPoint(k, P, p, container) {
   if (k === 0) return ["*", "*"];
   if (k === 1) return P;
 
@@ -253,10 +485,16 @@ function multiplyPoint(k, P, p) {
   pointsP.push(result);
   let decomposTwo = decomposingTwo(k);
 
+  const divDecomposTwo = document.createElement("div");
+  decomposTwo.map((el) => {
+    divDecomposTwo.innerHTML += `<div class="row">${Math.pow(2, el)}</div>`;
+  });
+  decompoaseNumberP.appendChild(divDecomposTwo);
+
   for (let i = 0; i <= decomposTwo[decomposTwo.length - 1]; i++) {
     console.log(`${Math.pow(2, i)}P = (${current[0]}; ${current[1]})`);
     points.push(current);
-    current = sumPoints(current, current, p);
+    current = sumPoints(current, current, p, container);
   }
 
   console.log("Сложение точек:");
@@ -276,7 +514,7 @@ function multiplyPoint(k, P, p) {
       const oldResult = [...result];
       const oldAccumulated = accumulated;
 
-      result = sumPoints(result, pointToAdd, p);
+      result = sumPoints(result, pointToAdd, p, container);
 
       accumulated += currentValue;
 
@@ -352,7 +590,7 @@ function checkHasseTheorem(p, curvePoints) {
   };
 }
 
-function findPointOrder(P, groupOrder, p) {
+function findPointOrder(P, groupOrder, p, container) {
   const divisors = [];
   for (let i = 1; i <= Math.sqrt(groupOrder); i++) {
     if (groupOrder % i === 0) {
@@ -365,71 +603,10 @@ function findPointOrder(P, groupOrder, p) {
   divisors.sort((a, b) => a - b);
 
   for (const k of divisors) {
-    const result = multiplyPoint(k, P, p);
+    const result = multiplyPoint(k, P, p, container);
     if (result[0] === "*" && result[1] === "*") {
       return k;
     }
   }
   return groupOrder;
 }
-
-// 2
-/* while (!checkX(x, a, b, p)) {
-  x++;
-} */
-
-/* console.log("x:", x);
-pointsP = [x, y];
-console.log("point p:", pointsP); */
-
-// 3
-/* const resultP = multiplyPoint(numberP, pointsP, p);
-console.log(`${numberP}P = (${resultP.join("; ")})`); */
-
-// 4
-/* const allPoints = findAllPoints(p);
-const orderInfo = checkHasseTheorem(p, allPoints);
-console.log(orderInfo); */
-
-// 5
-/* if (pointsP[0] !== "*") {
-  console.log("\n" + "=".repeat(50));
-  console.log("ШАГ 5: ПОРЯДОК ТОЧКИ P");
-  console.log("=".repeat(50));
-
-  const ySquared =
-    (pointsP[0] * pointsP[0] * pointsP[0] + a * pointsP[0] + b) % p;
-  const actualYSquared = (pointsP[1] * pointsP[1]) % p;
-
-  if (ySquared === actualYSquared) {
-    console.log(`✓ Точка P(${pointsP[0]}, ${pointsP[1]}) принадлежит кривой`);
-
-    const groupOrder = allPoints.length;
-    const pointOrder = findPointOrder(pointsP, groupOrder, p);
-
-    console.log(`Порядок группы: ${groupOrder}`);
-    console.log(`Порядок точки P: ${pointOrder}`);
-
-    const lagrangeCheck = groupOrder % pointOrder === 0;
-    console.log(
-      `Проверка теоремы Лагранжа: ${groupOrder} % ${pointOrder} === 0`
-    );
-    console.log(`Результат: ${lagrangeCheck ? "✓ ВЕРНО" : "✗ ОШИБКА"}`);
-
-    if (lagrangeCheck) {
-      const cofactor = groupOrder / pointOrder;
-      console.log(`Кофактор: ${groupOrder} / ${pointOrder} = ${cofactor}`);
-
-      if (pointOrder === groupOrder) {
-        console.log(
-          "✓ Точка P является образующей (порядок равен порядку группы)"
-        );
-      } else {
-        console.log("Точка P не является образующей");
-      }
-    }
-  } else {
-    console.log("✗ ОШИБКА: Точка P не принадлежит кривой!");
-  }
-}
- */
