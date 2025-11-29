@@ -148,10 +148,6 @@ canvas {
       }
     }
 
-    .decompose-number-p {
-      display: flex;
-    }
-
     .container-p {
       display: flex;
       justify-content: center;

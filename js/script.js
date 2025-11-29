@@ -26,6 +26,10 @@ const findBtnX = document.getElementById("findBtnX");
 const containerX = document.querySelector(".container-x");
 const decompoaseNumberP = document.querySelector(".decompose-number-p");
 const containerPoints = document.querySelector(".container-points");
+const containerPointsHasse = document.querySelector(".container-points-hasse");
+const containerPointPoriadok = document.querySelector(
+  ".container-point-poriadok"
+);
 
 function validNumberField(fieldValue) {
   if (fieldValue.trim() === "") {
@@ -218,7 +222,15 @@ function calculateStep4() {
       console.log(`✓ Точка P(${pointsP[0]}, ${pointsP[1]}) принадлежит кривой`);
 
       const groupOrder = allPoints.length;
-      const pointOrder = findPointOrder(pointsP, groupOrder, p);
+
+      containerPointPoriadok.innerHTML = "";
+
+      const pointOrder = findPointOrder(
+        pointsP,
+        groupOrder,
+        p,
+        containerPointPoriadok
+      );
 
       console.log(`Порядок группы: ${groupOrder}`);
       console.log(`Порядок точки P: ${pointOrder}`);
