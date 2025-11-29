@@ -149,6 +149,11 @@ function updateUI() {
   const canProceed = validSteps[currentStep] && currentStep < maxStep;
   nextButton.disabled = !canProceed;
 
+  const stepNumElement = document.getElementById("stepNum");
+  if (stepNumElement) {
+    stepNumElement.textContent = `Шаг ${currentStep + 1} из ${maxStep + 1}`;
+  }
+
   const pages = pageContent.querySelectorAll(".page");
 
   pages.forEach((el, index) => {
@@ -168,10 +173,9 @@ function updateUI() {
 }
 
 function calculateStep2() {
-  console.log("Выполняем вычисления для шага 2...");
+  decompoaseNumberP.innerHTML = "";
 
   const resultP = multiplyPoint(numberP, pointsP, p, containerPoints);
-  console.log(`${numberP}P = (${resultP.join("; ")})`);
 
   const step2Result = document.getElementById("step2Result");
   if (step2Result) {
@@ -183,11 +187,8 @@ function calculateStep2() {
 }
 
 function calculateStep3() {
-  console.log("Выполняем вычисления для шага 3...");
-
   const allPoints = findAllPoints(p);
   const orderInfo = checkHasseTheorem(p, allPoints);
-  console.log(orderInfo);
 
   const step3Result = document.getElementById("step3Result");
   if (step3Result) {
@@ -205,22 +206,14 @@ function calculateStep3() {
 }
 
 function calculateStep4() {
-  console.log("Выполняем вычисления для шага 4...");
-
   const allPoints = findAllPoints(p);
 
   if (pointsP[0] !== "*") {
-    console.log("\n" + "=".repeat(50));
-    console.log("ШАГ 4: ПОРЯДОК ТОЧКИ P");
-    console.log("=".repeat(50));
-
     const ySquared =
       (pointsP[0] * pointsP[0] * pointsP[0] + a * pointsP[0] + b) % p;
     const actualYSquared = (pointsP[1] * pointsP[1]) % p;
 
     if (ySquared === actualYSquared) {
-      console.log(`✓ Точка P(${pointsP[0]}, ${pointsP[1]}) принадлежит кривой`);
-
       const groupOrder = allPoints.length;
 
       containerPointPoriadok.innerHTML = "";
@@ -232,14 +225,23 @@ function calculateStep4() {
         containerPointPoriadok
       );
 
-      console.log(`Порядок группы: ${groupOrder}`);
-      console.log(`Порядок точки P: ${pointOrder}`);
-
       const lagrangeCheck = groupOrder % pointOrder === 0;
-      console.log(
-        `Проверка теоремы Лагранжа: ${groupOrder} % ${pointOrder} === 0`
-      );
-      console.log(`Результат: ${lagrangeCheck ? "✓ ВЕРНО" : "✗ ОШИБКА"}`);
+
+      const decomposeOrderContainer = document.createElement("div");
+      decomposeOrderContainer.className = "decompose-order-step5";
+      decomposeOrderContainer.innerHTML = `<h3>Декомпозиция порядка точки ${pointOrder} на степени двойки:</h3>`;
+
+      const orderDecomposition = decomposingTwo(pointOrder);
+      const divDecomposOrder = document.createElement("div");
+      divDecomposOrder.innerHTML = orderDecomposition
+        .map(
+          (el) =>
+            `<div class="row">2<sup>${el}</sup> = ${Math.pow(2, el)}</div>`
+        )
+        .join("");
+
+      decomposeOrderContainer.appendChild(divDecomposOrder);
+      containerPointPoriadok.appendChild(decomposeOrderContainer);
 
       const step4Result = document.getElementById("step4Result");
       if (step4Result) {
@@ -263,8 +265,6 @@ function calculateStep4() {
         step4Result.innerHTML = resultHTML;
       }
     } else {
-      console.log("✗ ОШИБКА: Точка P не принадлежит кривой!");
-
       const step4Result = document.getElementById("step4Result");
       if (step4Result) {
         step4Result.innerHTML = "ОШИБКА: Точка P не принадлежит кривой!";
@@ -411,10 +411,8 @@ function sumPoints(P, Q, p, container) {
     divHeader.innerHTML = `Случай 3 (${P[0]}; ${P[1]}) и (${Q[0]}; ${Q[1]}): x_2 == x_1 и y_2 == y_1.`;
 
     const temp = sumMod(2 * P[1], p - 2, p);
-    console.log(`temp: ${temp}`);
 
     const k = sumMod((3 * Math.pow(P[0], 2) + a) * temp, 1, p);
-    console.log(`k: ${k}`);
 
     const x = sumMod(Math.pow(k, 2) - 2 * P[0], 1, p);
     const y = sumMod(k * (P[0] - x) - P[1], 1, p);
@@ -456,10 +454,8 @@ function sumPoints(P, Q, p, container) {
     divHeader.innerHTML = `Случай 1 (${P[0]}; ${P[1]}) и (${Q[0]}; ${Q[1]}): x_2 != x_1.`;
 
     const temp = sumMod(Q[0] - P[0], p - 2, p);
-    console.log(`temp: ${temp}`);
 
     const k = sumMod((Q[1] - P[1]) * temp, 1, p);
-    console.log(`k: ${k}`);
 
     const x = sumMod(Math.pow(k, 2) - P[0] - Q[0], 1, p);
     const y = sumMod(k * (P[0] - x) - P[1], 1, p);
@@ -497,19 +493,19 @@ function multiplyPoint(k, P, p, container) {
   pointsP.push(result);
   let decomposTwo = decomposingTwo(k);
 
-  const divDecomposTwo = document.createElement("div");
-  decomposTwo.map((el) => {
-    divDecomposTwo.innerHTML += `<div class="row">${Math.pow(2, el)}</div>`;
-  });
-  decompoaseNumberP.appendChild(divDecomposTwo);
+  if (currentStep === 2) {
+    const divDecomposTwo = document.createElement("div");
+    decomposTwo.map((el) => {
+      divDecomposTwo.innerHTML += `<div class="row">${Math.pow(2, el)}</div>`;
+    });
+    decompoaseNumberP.appendChild(divDecomposTwo);
+  }
 
   for (let i = 0; i <= decomposTwo[decomposTwo.length - 1]; i++) {
     console.log(`${Math.pow(2, i)}P = (${current[0]}; ${current[1]})`);
     points.push(current);
     current = sumPoints(current, current, p, container);
   }
-
-  console.log("Сложение точек:");
 
   let accumulated = 0;
 
@@ -555,41 +551,11 @@ function checkHasseTheorem(p, curvePoints) {
   const pLower = p + 1 - sqrtP;
   const pUpper = p + 1 + sqrtP;
 
-  console.log("\n" + "=".repeat(60));
-  console.log("ДЕТАЛЬНАЯ ПРОВЕРКА ТЕОРЕМЫ ХАССЕ");
-  console.log("=".repeat(60));
-  console.log(`Порядок поля: p = ${p}`);
-  console.log(`Количество точек на кривой: G = ${G}`);
-  console.log(`Ожидаемое количество точек: p + 1 = ${p + 1}`);
-  console.log(`√p = ${sqrtP.toFixed(6)}`);
-
-  console.log(`Граница: ${pLower} <= ${p + 1} <= ${pUpper}`);
-
   const hasseSatisfied = pLower <= G && G <= pUpper;
-
-  console.log(`\nПроверка: ${pLower} ≤ ${G} ≤ ${pUpper}`);
-  console.log(`Теорема Хассе выполняется: ${hasseSatisfied}`);
 
   const deviation = Math.abs(G - (p + 1));
   const maxAllowedDeviation = 2 * sqrtP;
   const deviationRatio = deviation / maxAllowedDeviation;
-
-  console.log(`\nДополнительная информация:`);
-  console.log(`Отклонение от p+1: |${G} - ${p + 1}| = ${deviation.toFixed(6)}`);
-  console.log(
-    `Максимально допустимое отклонение: 2√p ≈ ${maxAllowedDeviation.toFixed(6)}`
-  );
-  console.log(`Отношение отклонения: ${deviationRatio.toFixed(4)}`);
-
-  if (hasseSatisfied) {
-    console.log(`✓ Теорема Хассе подтверждена!`);
-  } else {
-    console.log(`✗ Нарушение теоремы Хассе!`);
-    console.log("Возможные причины:");
-    console.log("- Ошибка в подсчете точек");
-    console.log("- Кривая не является гладкой");
-    console.log("- Особенности реализации");
-  }
 
   return {
     p: p,
