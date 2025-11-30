@@ -404,6 +404,7 @@ function sumPoints(P, Q, p, container) {
     container.appendChild(divPoint);
     return Q;
   }
+
   if (Q[0] === "*" && Q[1] === "*") {
     divPoint.innerHTML = `Q: (${Q[0]}; ${Q[1]})`;
     container.appendChild(divPoint);
@@ -415,7 +416,7 @@ function sumPoints(P, Q, p, container) {
   const divPointY = document.createElement("div");
   const divPointResult = document.createElement("div");
 
-  if (P[0] === Q[0] && P[1] + Q[1] === 0) {
+  if (P[0] === Q[0] && (P[1] + Q[1]) % p === 0) {
     divHeader.innerHTML = `Случай 2 (${P[0]}; ${P[1]}) и (${Q[0]}; ${Q[1]}): Бесконечно удаленная точка.`;
     divPointResult.innerHTML = `(*; *)`;
 
@@ -430,14 +431,12 @@ function sumPoints(P, Q, p, container) {
     divHeader.innerHTML = `Случай 3 (${P[0]}; ${P[1]}) и (${Q[0]}; ${Q[1]}): x_2 == x_1 и y_2 == y_1.`;
 
     const temp = sumMod(2 * P[1], p - 2, p);
-
     const k = sumMod((3 * Math.pow(P[0], 2) + a) * temp, 1, p);
-
     const x = sumMod(Math.pow(k, 2) - 2 * P[0], 1, p);
     const y = sumMod(k * (P[0] - x) - P[1], 1, p);
 
     divPointK.innerHTML = `k = (3 * ${P[0]}<sup>2</sup> + ${a})(2 * ${
-      Q[0]
+      P[1]
     })<sup>-1</sup> mod ${p} = ${
       3 * Math.pow(P[0], 2) + a
     } * ${temp} mod ${p} = ${k}`;
@@ -447,8 +446,8 @@ function sumPoints(P, Q, p, container) {
     } mod ${p} = ${Math.pow(k, 2)} - ${2 * P[0]} mod ${p} = ${x}`;
 
     divPointY.innerHTML = `y = ${k} * (${P[0]} - ${x}) - ${
-      Q[0]
-    } mod ${p} = ${k} * ${P[0] - x} - ${Q[0]} mod ${p} = ${y}`;
+      P[1]
+    } mod ${p} = ${k} * ${P[0] - x} - ${P[1]} mod ${p} = ${y}`;
 
     divPointResult.innerHTML = `(${x}; ${y})`;
 
@@ -466,21 +465,21 @@ function sumPoints(P, Q, p, container) {
     divHeader.innerHTML = `Случай 1 (${P[0]}; ${P[1]}) и (${Q[0]}; ${Q[1]}): x_2 != x_1.`;
 
     const temp = sumMod(Q[0] - P[0], p - 2, p);
-
     const k = sumMod((Q[1] - P[1]) * temp, 1, p);
-
     const x = sumMod(Math.pow(k, 2) - P[0] - Q[0], 1, p);
     const y = sumMod(k * (P[0] - x) - P[1], 1, p);
 
-    divPointK.innerHTML = `k = (${Q[1]} - ${Q[0]})(${P[1]} - ${P[0]})<sup>-1</sup> mod ${p} = ${Q[1]} - ${Q[0]} * ${temp} mod ${p} = ${k}`;
+    divPointK.innerHTML = `k = (${Q[1]} - ${P[1]})(${Q[0]} - ${
+      P[0]
+    })<sup>-1</sup> mod ${p} = ${Q[1] - P[1]} * ${temp} mod ${p} = ${k}`;
 
     divPointX.innerHTML = `x = ${k}<sup>2</sup> - (${P[0]} + ${
-      P[1]
-    }) mod ${p} = ${Math.pow(k, 2)} - ${P[0] + P[1]} mod ${p} = ${x}`;
+      Q[0]
+    }) mod ${p} = ${Math.pow(k, 2)} - ${P[0] + Q[0]} mod ${p} = ${x}`;
 
     divPointY.innerHTML = `y = ${k} * (${P[0]} - ${x}) - ${
-      Q[0]
-    } mod ${p} = ${k} * ${P[0] - x} - ${Q[0]} mod ${p} = ${y}`;
+      P[1]
+    } mod ${p} = ${k} * ${P[0] - x} - ${P[1]} mod ${p} = ${y}`;
 
     divPointResult.innerHTML = `(${x}; ${y})`;
 
@@ -493,6 +492,8 @@ function sumPoints(P, Q, p, container) {
 
     return [x, y];
   }
+
+  return ["*", "*"];
 }
 
 function multiplyPoint(k, P, p, container) {
