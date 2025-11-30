@@ -415,6 +415,17 @@ function sumPoints(P, Q, p, container) {
   const divPointY = document.createElement("div");
   const divPointResult = document.createElement("div");
 
+  if (P[0] === Q[0] && P[1] + Q[1] === 0) {
+    divHeader.innerHTML = `Случай 2 (${P[0]}; ${P[1]}) и (${Q[0]}; ${Q[1]}): Бесконечно удаленная точка.`;
+    divPointResult.innerHTML = `(*; *)`;
+
+    divCard.appendChild(divHeader);
+    divCard.appendChild(divPointResult);
+    container.appendChild(divCard);
+
+    return ["*", "*"];
+  }
+
   if (P[0] === Q[0] && P[1] === Q[1]) {
     divHeader.innerHTML = `Случай 3 (${P[0]}; ${P[1]}) и (${Q[0]}; ${Q[1]}): x_2 == x_1 и y_2 == y_1.`;
 
@@ -449,16 +460,9 @@ function sumPoints(P, Q, p, container) {
     container.appendChild(divCard);
 
     return [x, y];
-  } else if (P[0] === Q[0] && P[1] + Q[1] === 0) {
-    divHeader.innerHTML = `Случай 2 (${P[0]}; ${P[1]}) и (${Q[0]}; ${Q[1]}): Бесконечно удаленная точка.`;
-    divPointResult.innerHTML = `(*; *)`;
+  }
 
-    divCard.appendChild(divHeader);
-    divCard.appendChild(divPointResult);
-    container.appendChild(divCard);
-
-    return ["*", "*"];
-  } else {
+  if (P[0] !== Q[0]) {
     divHeader.innerHTML = `Случай 1 (${P[0]}; ${P[1]}) и (${Q[0]}; ${Q[1]}): x_2 != x_1.`;
 
     const temp = sumMod(Q[0] - P[0], p - 2, p);
