@@ -175,11 +175,15 @@ function updateUI() {
 function calculateStep2() {
   decompoaseNumberP.innerHTML = "";
 
+  containerPoints.innerHTML = "";
+
   const resultP = multiplyPoint(numberP, pointsP, p, containerPoints);
 
   const step2Result = document.getElementById("step2Result");
   if (step2Result) {
-    step2Result.innerHTML = `${numberP}P = (${resultP.join("; ")})`;
+    step2Result.innerHTML = `<h3>Результат:</h3>${numberP}P = (${resultP.join(
+      "; "
+    )})`;
   }
 
   validSteps[2] = true;
@@ -246,19 +250,22 @@ function calculateStep4() {
       const step4Result = document.getElementById("step4Result");
       if (step4Result) {
         let resultHTML = `
-          Порядок группы: ${groupOrder}<br>
-          Порядок точки P: ${pointOrder}<br>
-          Теорема Лагранжа: ${lagrangeCheck ? "выполняется" : "не выполняется"}
+          <h3>Результаты:</h3>
+          <div><strong>Порядок группы:</strong> ${groupOrder}</div>
+          <div><strong>Порядок точки P:</strong> ${pointOrder}</div>
+          <div><strong>Теорема Лагранжа:</strong> ${
+            lagrangeCheck ? "✓ выполняется" : "✗ не выполняется"
+          }</div>
         `;
 
         if (lagrangeCheck) {
           const cofactor = groupOrder / pointOrder;
-          resultHTML += `<br>Кофактор: ${groupOrder} / ${pointOrder} = ${cofactor}`;
+          resultHTML += `<div><strong>Кофактор:</strong> ${groupOrder} / ${pointOrder} = ${cofactor}</div>`;
 
           if (pointOrder === groupOrder) {
-            resultHTML += `<br>✓ Точка P является образующей (порядок равен порядку группы)`;
+            resultHTML += `<div style="color: green; font-weight: bold;">✓ Точка P является образующей (порядок равен порядку группы)</div>`;
           } else {
-            resultHTML += `<br>Точка P не является образующей`;
+            resultHTML += `<div style="color: orange;">Точка P не является образующей</div>`;
           }
         }
 
@@ -267,7 +274,8 @@ function calculateStep4() {
     } else {
       const step4Result = document.getElementById("step4Result");
       if (step4Result) {
-        step4Result.innerHTML = "ОШИБКА: Точка P не принадлежит кривой!";
+        step4Result.innerHTML =
+          "<div style='color: red; font-weight: bold;'>ОШИБКА: Точка P не принадлежит кривой!</div>";
       }
     }
   }
@@ -490,28 +498,36 @@ function multiplyPoint(k, P, p, container) {
   let result = ["*", "*"];
   let current = P;
   let points = [];
-  pointsP.push(result);
   let decomposTwo = decomposingTwo(k);
 
   if (currentStep === 2) {
+    decompoaseNumberP.innerHTML = "<h3>Декомпозиция числа 151:</h3>";
     decomposTwo.map((el) => {
-      decompoaseNumberP.innerHTML += `<div class="row">${Math.pow(
+      decompoaseNumberP.innerHTML += `<div class="row">2<sup>${el}</sup> = ${Math.pow(
         2,
         el
       )}</div>`;
     });
   }
 
+  const containerBefore = document.createElement("div");
+  containerBefore.className = "container-before";
+
   for (let i = 0; i <= decomposTwo[decomposTwo.length - 1]; i++) {
-    container.innerHTML += `${Math.pow(2, i)}P = (${current[0]}; ${
-      current[1]
-    })`;
+    const div = document.createElement("div");
+    div.innerHTML = `${Math.pow(2, i)}P = (${current[0]}; ${current[1]})`;
+    containerBefore.appendChild(div);
 
     points.push(current);
-    current = sumPoints(current, current, p, container);
+    current = sumPoints(current, current, p, containerBefore);
   }
 
+  container.appendChild(containerBefore);
+
   let accumulated = 0;
+
+  const containerAfter = document.createElement("div");
+  containerAfter.className = "container-after";
 
   for (let i = 0; i < decomposTwo.length; i++) {
     const power = decomposTwo[i];
@@ -521,20 +537,25 @@ function multiplyPoint(k, P, p, container) {
     if (result[0] === "*" && result[1] === "*") {
       result = pointToAdd;
       accumulated = currentValue;
-      container.innerHTML += `${currentValue}P = (${result[0]}; ${result[1]})`;
+      const div = document.createElement("div");
+      div.innerHTML = `${currentValue}P = (${result[0]}; ${result[1]})`;
+      containerAfter.appendChild(div);
     } else {
       const oldResult = [...result];
       const oldAccumulated = accumulated;
 
-      result = sumPoints(result, pointToAdd, p, container);
+      result = sumPoints(result, pointToAdd, p, containerAfter);
 
       accumulated += currentValue;
 
-      container.innerHTML += `${oldAccumulated}P + ${currentValue}P = ${pointToString(
+      const div = document.createElement("div");
+      div.innerHTML = `${oldAccumulated}P + ${currentValue}P = ${pointToString(
         oldResult
       )} + ${pointToString(pointToAdd)} = ${pointToString(result)}`;
+      containerAfter.appendChild(div);
     }
   }
+  container.appendChild(containerAfter);
 
   return result;
 }
