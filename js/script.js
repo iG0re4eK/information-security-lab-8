@@ -31,6 +31,41 @@ const containerPointPoriadok = document.querySelector(
   ".container-point-poriadok"
 );
 
+function resetAllData() {
+  p = null;
+  y = null;
+  pointsP = [];
+  a = 1;
+  b = 0;
+  currentStep = minStep;
+  validSteps = Array(maxStep + 1).fill(false);
+
+  containerX.innerHTML = "";
+  containerSetP.innerHTML = "";
+  decompoaseNumberP.innerHTML = "";
+  containerPoints.innerHTML = "";
+  containerPointsHasse.innerHTML = "";
+  containerPointPoriadok.innerHTML = "";
+
+  aValue.value = "1";
+  bValue.value = "0";
+
+  pValue.classList.remove("valid", "invalid");
+
+  const step2Result = document.getElementById("step2Result");
+  const step3Result = document.getElementById("step3Result");
+  const step4Result = document.getElementById("step4Result");
+
+  if (step2Result) step2Result.innerHTML = "";
+  if (step3Result) step3Result.innerHTML = "";
+  if (step4Result) step4Result.innerHTML = "";
+}
+
+pValue.addEventListener("input", () => {
+  resetAllData();
+  init();
+});
+
 function validNumberField(fieldValue) {
   if (fieldValue.trim() === "") {
     return { isValid: false, message: "Поле не может быть пустым" };
