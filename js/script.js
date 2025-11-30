@@ -562,8 +562,6 @@ function multiplyPoint(k, P, p, container) {
     current = sumPoints(current, current, p, containerBefore);
   }
 
-  container.appendChild(containerBefore);
-
   let accumulated = 0;
 
   const containerAfter = document.createElement("div");
@@ -595,7 +593,13 @@ function multiplyPoint(k, P, p, container) {
       containerAfter.appendChild(div);
     }
   }
-  container.appendChild(containerAfter);
+
+  const forContainer = document.createElement("div");
+
+  forContainer.appendChild(containerBefore);
+  forContainer.appendChild(containerAfter);
+
+  container.appendChild(forContainer);
 
   return result;
 }
