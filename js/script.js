@@ -494,15 +494,19 @@ function multiplyPoint(k, P, p, container) {
   let decomposTwo = decomposingTwo(k);
 
   if (currentStep === 2) {
-    const divDecomposTwo = document.createElement("div");
     decomposTwo.map((el) => {
-      divDecomposTwo.innerHTML += `<div class="row">${Math.pow(2, el)}</div>`;
+      decompoaseNumberP.innerHTML += `<div class="row">${Math.pow(
+        2,
+        el
+      )}</div>`;
     });
-    decompoaseNumberP.appendChild(divDecomposTwo);
   }
 
   for (let i = 0; i <= decomposTwo[decomposTwo.length - 1]; i++) {
-    console.log(`${Math.pow(2, i)}P = (${current[0]}; ${current[1]})`);
+    container.innerHTML += `${Math.pow(2, i)}P = (${current[0]}; ${
+      current[1]
+    })`;
+
     points.push(current);
     current = sumPoints(current, current, p, container);
   }
@@ -517,7 +521,7 @@ function multiplyPoint(k, P, p, container) {
     if (result[0] === "*" && result[1] === "*") {
       result = pointToAdd;
       accumulated = currentValue;
-      console.log(`${currentValue}P = (${result[0]}; ${result[1]})`);
+      container.innerHTML += `${currentValue}P = (${result[0]}; ${result[1]})`;
     } else {
       const oldResult = [...result];
       const oldAccumulated = accumulated;
@@ -526,13 +530,9 @@ function multiplyPoint(k, P, p, container) {
 
       accumulated += currentValue;
 
-      console.log(
-        `${oldAccumulated}P + ${currentValue}P = ${pointToString(
-          oldResult
-        )} + ${pointToString(pointToAdd)} = ${pointToString(result)}`
-      );
-
-      console.log(`=`.repeat(60));
+      container.innerHTML += `${oldAccumulated}P + ${currentValue}P = ${pointToString(
+        oldResult
+      )} + ${pointToString(pointToAdd)} = ${pointToString(result)}`;
     }
   }
 
