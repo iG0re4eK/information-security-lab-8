@@ -264,8 +264,6 @@ function calculateStep4() {
         containerPointPoriadok
       );
 
-      const lagrangeCheck = groupOrder % pointOrder === 0;
-
       const decomposeOrderContainer = document.createElement("div");
       decomposeOrderContainer.className = "decompose-order-step5";
       decomposeOrderContainer.innerHTML = `<h3>Декомпозиция порядка точки ${pointOrder} на степени двойки:</h3>`;
@@ -287,22 +285,7 @@ function calculateStep4() {
         let resultHTML = `
           <h3>Результаты:</h3>
           <div><strong>Порядок группы:</strong> ${groupOrder}</div>
-          <div><strong>Порядок точки P:</strong> ${pointOrder}</div>
-          <div><strong>Теорема Лагранжа:</strong> ${
-            lagrangeCheck ? "✓ выполняется" : "✗ не выполняется"
-          }</div>
-        `;
-
-        if (lagrangeCheck) {
-          const cofactor = groupOrder / pointOrder;
-          resultHTML += `<div><strong>Кофактор:</strong> ${groupOrder} / ${pointOrder} = ${cofactor}</div>`;
-
-          if (pointOrder === groupOrder) {
-            resultHTML += `<div style="color: green; font-weight: bold;">✓ Точка P является образующей (порядок равен порядку группы)</div>`;
-          } else {
-            resultHTML += `<div style="color: orange;">Точка P не является образующей</div>`;
-          }
-        }
+          <div><strong>Порядок точки P:</strong> ${pointOrder}</div>`;
 
         step4Result.innerHTML = resultHTML;
       }
@@ -612,7 +595,7 @@ function pointToString(point) {
 function checkHasseTheorem(p, curvePoints) {
   let G = curvePoints.length;
 
-  const sqrtP = Math.round(Math.sqrt(p));
+  const sqrtP = 2 * Math.round(Math.sqrt(p));
   const pLower = p + 1 - sqrtP;
   const pUpper = p + 1 + sqrtP;
 
